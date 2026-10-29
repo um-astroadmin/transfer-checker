@@ -1,4 +1,11 @@
 #!/bin/bash
+while getopts "" opt; do
+  case $opt in
+    *) exit 1 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
 dir=${1:-.}
 pushd $dir > /dev/null
 
@@ -8,11 +15,19 @@ badsum=()
 
 while IFS=',' read -r path size sum || [ -n "$path" ]; do
   if [ -r $path ]; then
-    metadata=`cksum $path`
+    case $sum in
+      NULL) # If the checksum is NULL, then run in "fast mode"
+        lsize=$(ls -nl "$path" | awk '{print $5}')
+        metadata="NULL $lsize $path"
+        ;;
+      *)
+        metadata=`cksum $path`
+    esac
+
     read -r lsum lsize rest <<< "$metadata"
     if [ "$size" -ne "$lsize" ]; then
       badsize+=("$path")
-    elif [ "$sum" -ne "$lsum" ]; then
+    elif [[ "$sum" != "NULL" && "$sum" -ne "$lsum" ]]; then
       badsum+=("$path")
     fi
   else
