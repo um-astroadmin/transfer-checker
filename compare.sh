@@ -38,7 +38,9 @@ done
 
 case $out in
   names)
-    echo "${missing[@]} ${badsize[@]} ${badsum[@]}"
+    printf '%s\n' "${missing[@]}"
+    printf '%s\n' "${badsize[@]}"
+    printf '%s\n' "${badsum[@]}"
     ;;
   *)
     if [ ${#missing[@]} -ne 0 ]; then
