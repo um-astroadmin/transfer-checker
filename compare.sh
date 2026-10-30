@@ -1,6 +1,7 @@
 #!/bin/bash
-while getopts "" opt; do
+while getopts "n" opt; do
   case $opt in
+    n) out='names' ;;
     *) exit 1 ;;
   esac
 done
@@ -35,14 +36,20 @@ while IFS=',' read -r path size sum || [ -n "$path" ]; do
   fi
 done
 
-if [ ${#missing[@]} -ne 0 ]; then
-  echo "Missing: ${missing[@]}"
-fi
-if [ ${#badsize[@]} -ne 0 ]; then
-  echo "Bad Size: ${badsize[@]}"
-fi
-if [ ${#badsum[@]} -ne 0 ]; then
-  echo "Bad Sum: ${badsum[@]}"
-fi
+case $out in
+  names)
+    echo "${missing[@]} ${badsize[@]} ${badsum[@]}"
+    ;;
+  *)
+    if [ ${#missing[@]} -ne 0 ]; then
+      echo "Missing: ${missing[@]}"
+    fi
+    if [ ${#badsize[@]} -ne 0 ]; then
+      echo "Bad Size: ${badsize[@]}"
+    fi
+    if [ ${#badsum[@]} -ne 0 ]; then
+      echo "Bad Sum: ${badsum[@]}"
+    fi
+esac
 
 popd > /dev/null
